@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+ 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ 	xsi:schemaLocation="http://www.springframework.org/schema/beans
+ 	http://www.springframework.org/schema/beans/spring-beans.xsd
+ 	http://www.springframework.org/schema/aop
+ 	http://www.springframework.org/schema/aop/spring-aop.xsd">
+ 	
+	<!-- 공통 기능을 제공할 클래스를 빈으로 등록 -->
+	<bean id="profiler" class="chap06.aop.Profiler"/>
+	
+	<!-- Aspect 설정 : advice를 어떤 pointcut에 적용 할 지 결정 -->
+	<aop:config>
+		<aop:aspect id="traceAspect" ref="profiler">
+			<aop:pointcut id="publicMethod"
+				expression=
+					"execution(public * chap06..*(..))"/>
+				<!-- chap06 패키지 및 하위 패키지에 있는 모든 public 메서드를 pointcut으로 설정한다 -->
+			<aop:around pointcut-ref="publicMethod" method="trace"/>
+			<!-- pointcut에 around advice로 profiler 빈 객체의 trace() 메서드를 적용 -->
+		</aop:aspect>
+	</aop:config>
+	
+	<bean id="writeArticleService" class="chap06.board.WriteArticleServiceImpl">
+		<constructor-arg>
+			<ref bean="articleDao"/>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="articleDao" class="chap06.board.MemoryArticleDao" />
+	<bean id="memberService" class="chap06.member.MemberServiceImpl"/>
+	
+</beans>
